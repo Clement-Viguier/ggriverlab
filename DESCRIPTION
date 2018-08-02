@@ -1,0 +1,15 @@
+Package: ggriverlab
+Type: Package
+Title: Introduce river labels in the ggplot2 framework
+Version: 0.1.0
+Author: Clément Viguier
+Maintainer: Clément Viguier <clem.viguier@wanadoo.fr>
+Description: Allows to create labels that follow a path for any plot created with ggplot2.
+Depends: R (3.4.1)
+Imports:
+  ggplot2,
+  dplyr,
+  tidyr
+License: Dunno....
+Encoding: UTF-8
+LazyData: true

@@ -1,0 +1,30 @@
+---
+title: "README"
+output: html_notebook
+---
+
+## Labels for rivers in the ggplot2 framework
+
+ggriverlab aims to introduce labels that follow lines to creat nice maps with ggplot2.
+Maybe I should learn how to use GIS dedicated softwares, but it is more to implement this function in R.
+
+## First step: positioning labels
+
+Before having functional labels and defining nice default parameters that give nice maps, I need to implement and test the basic postiioning of labels along a path.
+
+
+
+### TO DO LIST
+
+- make it work with point: place points along the path in place of letters.
+- include in geom
+- make it work with entire labels
+- make it work with letters
+
+
+### TO DO if the rest is done and clean
+
+- make river specific geom (size~order)
+- make interactive tool to test the parameters
+- find good default parameters
+- scale against text size or plot size ?
