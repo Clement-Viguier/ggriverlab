@@ -46,7 +46,8 @@ point_on <- function(d, x, y){
   det <- B^2 - 4 * A * C
   if ((A <= 0.0000001) || (det < 0)){
   # No real solutions.
-    return(numeric(0))
+    L <- length(df$x)
+    return(c(df[L,1], df[L,2]))
   } else if (det == 0) {
    # One solution.
   t = - B / (2 * A)
@@ -58,6 +59,6 @@ point_on <- function(d, x, y){
     # t = (-B - sqrt(det)) / (2 * A)
     # point2 <- c(s$xn + t * dx, s$yn + t * dy)
   }
-  print(point)
+  return(point)
 }
 

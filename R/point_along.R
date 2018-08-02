@@ -6,7 +6,7 @@
 #' @param x vector of the x-position of the points along the path.
 #' @param y vector of the y-position of the points along the path.
 #'
-#' @return vector of (x,y) coordinates of the reasearch point. Returns an empty numeric vector if the point if not found.
+#' @return vector of (x,y) coordinates of the reasearch point. Returns extremities if the distance in negative or null, or too long.
 #' @export
 #'
 #' @examples
@@ -25,21 +25,28 @@ point_along <- function(d, x, y){
   df <- data.frame(x,y)
 
   # compute segment lengths
-  df <- df %>% mutate(xn = lag(x, 1),
+  df2 <- df %>% mutate(xn = lag(x, 1),
                       yn = lag(y, 1),
                       l = sqrt((xn-x)^2 + (yn-y)^2)) %>%
     filter(!is.na(l)) %>%
     mutate(cuml= cumsum(l))
 
+
+  # print(c(dx, dy))
+  if (d <= 0){
+    return(c(df[1,1], df[1,2]))
+  } else if (d > max(df2$cuml)){
+    L <- length(df$x)
+    return(c(df[L,1], df[L,2]))
+  } else {
+
   # identify the segment containing the point separated from the first point by linear distance along the path of d
-  s <- df  %>% filter(cuml >= d & (cuml - l) < d)
+  s <- df2  %>% filter(cuml >= d & (cuml - l) < d)
 
   # compute the mean of the segment's extremities weighted by the relative distance of the searched point.
   w <- (d - (s$cuml - s$l)) / s$l
   dx <- (s$x * (1 - w) + s$xn * w)
   dy <- (s$y * (1 - w) + s$yn * w)
-
-  # print(c(dx, dy))
-
   return(c(dx, dy))
+  }
 }
