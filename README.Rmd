@@ -28,7 +28,7 @@ Before having functional labels and defining nice default parameters that give n
 
 - $\Box$ make river specific geom (size~order);
 - $\Box$ make interactive tool to test the parameters; 
-- $\Box$ find good default parameters;
+- $\checkmark$ find good default parameters;
 - $\Box$ scale against text size or plot size ?;
 
 
@@ -63,12 +63,14 @@ ggplot(full_river, aes(x,y, group = branch, colour = as.factor(branch))) + geom_
 
 # Check_length avoids to print labels that cannot fit the river portion.
 ggplot(full_river, aes(x,y, group = branch, colour = as.factor(branch))) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk"), check_length = T) +
-  theme(legend.position = "none")
+  theme_minimal() +theme(legend.position = "none")
 
 
 ```
 
+The `geom_river_label` function can be used to plot multiple river, or branches at once. If the are too short, the label can be exclude thanks to the option `check_length = T`. The above code produce the following map of the river:
 
+![river labeling with ggriverlab](https://github.com/Clement-Viguier/ggriverlab/blob/master/Images/river_branches.png)
 
 
 ```{r animate}
@@ -90,3 +92,8 @@ anim
 anim_save("Images/moving_label_smooth.gif", last_animation())
 ```
 
+The effect of the different parameters can be seen here:
+
+![offset parameter effect on river label](https://github.com/Clement-Viguier/ggriverlab/blob/master/Images/moving_label_offset.gif)
+![dist parameter effect on river label](https://github.com/Clement-Viguier/ggriverlab/blob/master/Images/moving_label_dist.gif)
+![vpos parameter effect on river label](https://github.com/Clement-Viguier/ggriverlab/blob/master/Images/moving_label_vpos.gif)
