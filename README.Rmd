@@ -16,15 +16,61 @@ Before having functional labels and defining nice default parameters that give n
 
 ### TO DO LIST
 
-- make it work with point: place points along the path in place of letters.
-- include in geom
-- make it work with entire labels
-- make it work with letters
+- $\checkmark$ make it work with point: place points along the path in place of letters;
+- $\checkmark$ include in geom;
+- $\Box$ make it work with entire labels as an option;
+- $\checkmark$ make it work with letters;
 
 
 ### TO DO if the rest is done and clean
 
-- make river specific geom (size~order)
-- make interactive tool to test the parameters
-- find good default parameters
-- scale against text size or plot size ?
+- $\Box$ make river specific geom (size~order);
+- $\Box$ make interactive tool to test the parameters; 
+- $\Box$ find good default parameters;
+- $\Box$ scale against text size or plot size ?;
+
+
+## Demo
+
+```{r gulk}
+library(ggriverlab)
+library(riverdist)
+library(ggplot2)
+
+river <- as.data.frame(Gulk$lines[4])
+colnames(river) <- c("x", "y")
+
+ggplot(river, aes(x,y)) + geom_path() + coord_fixed()
+ggplot(river, aes(x,y)) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk", offset = 14000, dist = 1500, vpos = 2000, win = 3000))
+
+# the full fiver
+
+branches <- 1:14
+branch_list <- lapply(branches, function(b, Gulk){
+  river <- as.data.frame(Gulk$lines[b])
+  colnames(river) <- c("x", "y")
+  river$branch <- b
+  return(river)
+}, Gulk)
+full_river<- do.call(rbind, branch_list)
+
+ggplot(full_river, aes(x,y, group = branch, colour = branch)) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk", offset = 6000, dist = 2000, vpos = 3000, win = 3000))
+
+
+```
+```{r animate}
+# install.packages('devtools')
+# devtools::install_github('thomasp85/gganimate')
+library(gganimate)
+
+# generate data for the animation
+offsets <- seq(2000, 21000, length.out = 10)
+list_data <- lapply(offsets, function(os, river){
+  river$off <- os
+  return(river)
+}, river)
+data_offset <- do.call(rbind, list_data)
+
+anim <- ggplot(data_offset, aes(x,y)) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk", offset = off, dist = 1500, vpos = 1500, win = 4000))+
+  transition_states(off, 1, 3)
+```

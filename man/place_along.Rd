@@ -4,12 +4,45 @@
 \alias{place_along}
 \title{Place along}
 \usage{
-place_along(label, x, y, offset, dist = 0.5, vpos = 0.2, win = 1,
+place_along(text, x, y, offset, dist = 0.5, vpos = 0.2, win = 1,
   centred = T)
 }
 \arguments{
-\item{centred}{}
+\item{text}{text to place along the path.}
+
+\item{x}{X coordinates of the path.}
+
+\item{y}{y coordinates of the path.}
+
+\item{offset}{distance from the starting point of the path.}
+
+\item{dist}{distance between letters.}
+
+\item{vpos}{Relative distance from the path (negative value put the label under the path).}
+
+\item{win}{width of the window to smooth the slope.}
+
+\item{centred}{is the label position centred on the path or adjusted to the window (default = T).}
 }
 \description{
-Place along
+Place letter s along a path.
+}
+\examples{
+y <- sort(floor(runif(50)*300)/20)
+x <- sort(floor(runif(50)*200)/20)
+win <- 6
+pos <- place_along("abcefg", x, y, 4, 1.5, 1.5, win =  win, centred = 1)
+ggplot(data.frame(x, y), aes(x,y))+ geom_path() + geom_text(data=pos, aes(label = label, angle= angle2 * 180 / pi), size = 14) + geom_point(data = pos, aes(refx, refy)) + coord_fixed() #+ geom_arc(data = pos, aes(refx, refy), radius = win/2, width = 15 * 2 * pi)
+
+
+# Another example with real river data from the riverdist package
+
+river <- Gulk$lines[[14]]
+river <- as.data.frame(river)
+colnames(river) <- c("x", "y")
+river
+win <- 1000
+pos <- place_along("Gulk", river$x, river$y, 4000, 1000, 500, win =  win, centred = 1)
+ggplot(river, aes(x,y))+ geom_path() + geom_text(data=pos, aes(label = letter, angle= angle * 180 / pi), size = 8) + geom_point(data = pos, aes(refx, refy)) + coord_fixed()
+
 }
