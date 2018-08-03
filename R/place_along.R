@@ -48,7 +48,7 @@ place_along <- function(text, x, y, offset, dist = 0.5, vpos = 0.2, win = 1, cen
   # print(typeof(segs))
 
     # define ref point
-  ref <- point_on(offset, x, y)
+  ref <- point_along(offset, x, y)
   if (length(ref) == 0){
     ref <- c(x[1], y[1])
     warning("Could not find the reference point. You may want to adjust the offset.")

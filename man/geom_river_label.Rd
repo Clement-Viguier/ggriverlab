@@ -6,25 +6,26 @@
 \usage{
 geom_river_label(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", ..., parse = FALSE, nudge_x = 0, nudge_y = 0,
-  na.rm = FALSE, centred = TRUE, show.legend = NA, inherit.aes = TRUE)
+  na.rm = FALSE, centred = TRUE, relative = TRUE, reverse = NA,
+  smoothing = TRUE, sg_order = 2, sg_length = 51, check_length = TRUE,
+  show.legend = FALSE, inherit.aes = TRUE)
 }
 \arguments{
 \item{parse}{If `TRUE`, the labels will be parsed into expressions and
 displayed as described in `?plotmath`.}
 
 \item{nudge_x, nudge_y}{Horizontal and vertical adjustment to nudge labels by.
-Useful for offsetting text from points, particularly on discrete scales.}
+Useful for offsetting text from points, particularly on discrete scales.
+@param relative SHould the positioning `aes` such as offset, dist, wind and vpos relative to the length of the path. The last three are relative to the longest path, for consistency reasons.
+@param reverse Should the label writen in the opposite direction. By default the direction is defined by the sign of the x coordinates of the begining and end of the path.
+If the path ends on the left relative to the start, the labeling is reversed.
+@param smoothing is the path smooth. TRUE by default, recommended to avoid weird kerning.
+@param sg_order Savitzky-Golay smoothing filter order. See `?sgolayfilt` for more details.
+@param sg_length Savitzky-Golay smoothing filter length. Must be odd. See `?sgolayfilt` for more details.}
 }
 \description{
 Text
 }
-\section{`geom_label`}{
-
-Currently `geom_label` does not support the `angle` aesthetic and
-is considerably slower than `geom_text`. The `fill` aesthetic
-controls the background colour of the label.
-}
-
 \section{Alignment}{
 
 You can modify text alignment with the `vjust` and `hjust`

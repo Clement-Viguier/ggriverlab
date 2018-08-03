@@ -1,6 +1,8 @@
 ---
 title: "README"
-output: html_notebook
+output:
+  html_document: default
+  html: default
 ---
 
 ## Labels for rivers in the ggplot2 framework
@@ -41,9 +43,11 @@ river <- as.data.frame(Gulk$lines[4])
 colnames(river) <- c("x", "y")
 
 ggplot(river, aes(x,y)) + geom_path() + coord_fixed()
-ggplot(river, aes(x,y)) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk", offset = 14000, dist = 1500, vpos = 2000, win = 3000))
+ggplot(river, aes(x,y)) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk", offset = 0.24), reverse = F)
 
-# the full fiver
+?geom_river_label
+
+# Plotting the full river
 
 branches <- 1:14
 branch_list <- lapply(branches, function(b, Gulk){
@@ -54,23 +58,35 @@ branch_list <- lapply(branches, function(b, Gulk){
 }, Gulk)
 full_river<- do.call(rbind, branch_list)
 
-ggplot(full_river, aes(x,y, group = branch, colour = branch)) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk", offset = 6000, dist = 2000, vpos = 3000, win = 3000))
+ggplot(full_river, aes(x,y, group = branch, colour = as.factor(branch))) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk"), check_length = F) +
+  theme(legend.position = "none")
+
+# Check_length avoids to print labels that cannot fit the river portion.
+ggplot(full_river, aes(x,y, group = branch, colour = as.factor(branch))) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk"), check_length = T) +
+  theme(legend.position = "none")
 
 
 ```
+
+
+
+
 ```{r animate}
 # install.packages('devtools')
 # devtools::install_github('thomasp85/gganimate')
 library(gganimate)
 
 # generate data for the animation
-offsets <- seq(2000, 21000, length.out = 10)
+offsets <- seq(0.05, 0.9, length.out = 20)
 list_data <- lapply(offsets, function(os, river){
   river$off <- os
   return(river)
 }, river)
 data_offset <- do.call(rbind, list_data)
 
-anim <- ggplot(data_offset, aes(x,y)) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk", offset = off, dist = 1500, vpos = 1500, win = 4000))+
+anim <- ggplot(data_offset, aes(x,y)) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk", offset = off), relative = T, check_length = F, reverse = F)+
   transition_states(off, 1, 3)
+anim
+anim_save("Images/moving_label_smooth.gif", last_animation())
 ```
+
