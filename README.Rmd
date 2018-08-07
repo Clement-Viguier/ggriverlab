@@ -10,26 +10,12 @@ output:
 ggriverlab aims to introduce labels that follow lines to creat nice maps with ggplot2.
 Maybe I should learn how to use GIS dedicated softwares, but it is more to implement this function in R.
 
-## First step: positioning labels
+## Installation
+```{r install}
+# install.packages("devtools")
+devtools::install_github("Clement-Viguier/ggriverlab")
 
-Before having functional labels and defining nice default parameters that give nice maps, I need to implement and test the basic postiioning of labels along a path.
-
-
-
-### TO DO LIST
-
-- $\checkmark$ make it work with point: place points along the path in place of letters;
-- $\checkmark$ include in geom;
-- $\Box$ make it work with entire labels as an option;
-- $\checkmark$ make it work with letters;
-
-
-### TO DO if the rest is done and clean
-
-- $\Box$ make river specific geom (size~order);
-- $\Box$ make interactive tool to test the parameters; 
-- $\checkmark$ find good default parameters;
-- $\Box$ scale against text size or plot size ?;
+```
 
 
 ## Demo
@@ -131,3 +117,19 @@ The effect of the different parameters can be seen here:
 <!--   theme_classic() + theme(panel.background = element_rect(fill = "steelblue")) -->
 
 <!-- ``` -->
+
+### TO DO LIST
+
+- $\checkmark$ make it work with point: place points along the path in place of letters;
+- $\checkmark$ include in geom;
+- $\Box$ make it work with entire labels as an option;
+- $\checkmark$ make it work with letters;
+
+
+### TO DO if the rest is done and clean
+
+- $\Box$ make river specific geom (size~order);
+- $\Box$ make interactive tool to test the parameters; 
+- $\checkmark$ find good default parameters;
+- $\Box$ scale against text size or plot size ?;
+
