@@ -19,16 +19,23 @@
 #' @importFrom ggplot2 ggproto
 #' @importFrom signal sgolayfilt
 #' @importFrom plyr ddply
-#' @param parse If `TRUE`, the labels will be parsed into expressions and
-#'   displayed as described in `?plotmath`.
+#' @param parse If TRUE, the labels will be parsed into expressions and
+#'   displayed as described in \code{?plotmath}.
 #' @param nudge_x,nudge_y Horizontal and vertical adjustment to nudge labels by.
 #'   Useful for offsetting text from points, particularly on discrete scales.
-#'   @param relative SHould the positioning `aes` such as offset, dist, wind and vpos relative to the length of the path. The last three are relative to the longest path, for consistency reasons.
-#'   @param reverse Should the label writen in the opposite direction. By default the direction is defined by the sign of the x coordinates of the begining and end of the path.
+#' @param relative if TRUE (default) the positioning \code{aes} such as offset, dist, wind and vpos is computed relative to the length of the longest path. The last three are relative to the longest path, for consistency reasons.
+#' @param reverse if TRUE the label is writen in the opposite direction. By default the direction is defined by the sign of the x coordinates of the begining and end of the path.
 #'   If the path ends on the left relative to the start, the labeling is reversed.
-#'   @param smoothing is the path smooth. TRUE by default, recommended to avoid weird kerning.
-#'   @param sg_order Savitzky-Golay smoothing filter order. See `?sgolayfilt` for more details.
-#'   @param sg_length Savitzky-Golay smoothing filter length. Must be odd. See `?sgolayfilt` for more details.
+#' @param repeated if TRUE the label is repeated along the path as often as possible. Each label is separated by a distance of \code{offset}.
+#' @param smoothing if TRUE(default)  smooth the path before computing the letter positioning. Recommended to avoid weird kerning.
+#' @param sg_order Savitzky-Golay smoothing filter order. See \code{?sgolayfilt} for more details.
+#' @param sg_length Savitzky-Golay smoothing filter length. Must be odd. See \code{?sgolayfilt} for more details.
+#' @param check_length if TRUE (default) the label is pletted only if there is enough space.
+#'
+#' @details Because the path of a river can be tortuous, the distances are linear "flight" distances rather than distances following the path.
+#' However if  \code{relative = TRUE} the computed distance are computed relatively to the length of the path group, therefore even a distance lower than 0.5 can place the label at the end of the path.
+#' For consistency reason if not repeated == FALSE the offset is relative to the path group length (consistency in the position of the unique labels), else it is relative to the maximum path group length (consistency in the distance between labels).
+#'
 #' @export
 #' @examples
 #'
@@ -42,6 +49,7 @@ geom_river_label <- function(mapping = NULL, data = NULL,
                              centred = TRUE,
                              relative = TRUE,
                              reverse = NA,
+                             repeated = FALSE,
                              smoothing = TRUE,
                              sg_order = 2,
                              sg_length = 51,
@@ -71,6 +79,7 @@ geom_river_label <- function(mapping = NULL, data = NULL,
       centred = centred,
       relative = relative,
       reverse = reverse,
+      repeated = repeated,
       smoothing = smoothing,
       sg_order = sg_order,
       sg_length = sg_length,
@@ -95,7 +104,7 @@ GeomRiverLabel <- ggproto("GeomRiverLabel", Geom,
                           ),
 
                           draw_panel = function(data, panel_params, coord, parse = FALSE,
-                                                na.rm = FALSE, centred = TRUE, relative = TRUE, reverse = NA,
+                                                na.rm = FALSE, centred = TRUE, relative = TRUE, reverse = NA, repeated = TRUE,
                                                 smoothing = TRUE, sg_order = 2, sg_length = 51, check_length = TRUE) {
 
 
@@ -119,17 +128,20 @@ GeomRiverLabel <- ggproto("GeomRiverLabel", Geom,
                                 dist = dist * max_length,
                                 win = win * max_length,
                                 vpos = vpos * max_length,
-                                offset = offset * length)
+                                offset = (offset * length * (1 - repeated)) + (offset * max_length * repeated))
+                              # If not repeated, the offset is relative to the path group length, else it is relative to the maximum path group length
                             }
 
 
                             # Compute the labels per group:
-                            data <- plyr::ddply(data, "group", function(df, centred, reverse, relative, smoothing, sg_orger, sg_length) {
+                            data <- plyr::ddply(data, "group", function(df, centred, reverse, relative, smoothing, sg_orger, sg_length, repeated, check_length) {
 
                                 # Smoothing:
-                              if (smoothing & length(df$x > 2)){
+                              if (smoothing & length(df$x) > 3){
                                 df$x <- sgolayfilt(df$x, sg_order, floor(min(sg_length, length(df$x) - 1)/2) * 2 + 1 )
                                 df$y <- sgolayfilt(df$y, sg_order, floor(min(sg_length, length(df$x) - 1)/2) * 2 + 1 )
+                                # df$x <- sgolayfilt(df$x, sg_order, sg_length )
+                                # df$y <- sgolayfilt(df$y, sg_order, sg_length)
                               }
 
                               # Change the direction of the path to keep the label on top if not decided
@@ -143,20 +155,22 @@ GeomRiverLabel <- ggproto("GeomRiverLabel", Geom,
                               }
 
                               # COmpute the position of each letter
-                              data2 <- place_along(text = df$label[1], df$x, df$y, offset = df$offset[1], dist = df$dist[1], vpos = df$vpos[1], win =df$win[1], centred = centred)
+                              data2 <- place_along(text = df$label[1], df$x, df$y,
+                                                   offset = df$offset[1], dist = df$dist[1], vpos = df$vpos[1], win =df$win[1],
+                                                   centred = centred, repeated = repeated, check_length = check_length)
                               data2$angle2 <- data2$angle * 180 / pi # convert to degrees
                               # merge with original data to keep the aes
-                              data2$group <- df$group[1]
+                              # print(data2)
+                              data2$group <- df$group[min(1, length(data2$x))]
                               data2 <- inner_join(data2, select(df[1,], -x, -y, -label), by = "group")
 
-                              # return empty data.frame is one letter is out of bounds
-                              if (any(is.na(data2$x)) & check_length){
-                                return(data[0,])
-                              }
 
                               return(data2)
-                            }, centred, reverse, relative, smoothing, sg_order, sg_length)
+                            },
+                            centred, reverse, relative, smoothing, sg_order, sg_length, repeated, check_length
+                            )
 
+                            # print(data)
                             if (dim(data)[1] < 1){
                               warning("No label to print. Plese adjust the aes (they might be too big).")
                             }

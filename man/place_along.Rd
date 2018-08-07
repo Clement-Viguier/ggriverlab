@@ -5,7 +5,7 @@
 \title{Place along}
 \usage{
 place_along(text, x, y, offset, dist = 0.5, vpos = 0.2, win = 1,
-  centred = T)
+  centred = T, repeated = T, check_length = T)
 }
 \arguments{
 \item{text}{text to place along the path.}
@@ -22,10 +22,12 @@ place_along(text, x, y, offset, dist = 0.5, vpos = 0.2, win = 1,
 
 \item{win}{width of the window to smooth the slope.}
 
-\item{centred}{is the label position centred on the path or adjusted to the window (default = T).}
+\item{centred}{if TRUE (default) the label position centred on the path, otherwise it is adjusted to the window defined by the parameter \code{win}.}
+
+\item{repeated}{if TRUE (default) the text is repeated along the path and each label is seperated by the offset, otherwise it is placed only once.}
 }
 \description{
-Place letter s along a path.
+Place letters of the given \code{text} along a path \code{(x, y)}. Used in \code{geom_river_label()}.
 }
 \examples{
 y <- sort(floor(runif(50)*300)/20)

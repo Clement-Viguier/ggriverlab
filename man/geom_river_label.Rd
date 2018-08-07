@@ -7,24 +7,38 @@
 geom_river_label(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", ..., parse = FALSE, nudge_x = 0, nudge_y = 0,
   na.rm = FALSE, centred = TRUE, relative = TRUE, reverse = NA,
-  smoothing = TRUE, sg_order = 2, sg_length = 51, check_length = TRUE,
-  show.legend = FALSE, inherit.aes = TRUE)
+  repeated = FALSE, smoothing = TRUE, sg_order = 2, sg_length = 51,
+  check_length = TRUE, show.legend = FALSE, inherit.aes = TRUE)
 }
 \arguments{
-\item{parse}{If `TRUE`, the labels will be parsed into expressions and
-displayed as described in `?plotmath`.}
+\item{parse}{If TRUE, the labels will be parsed into expressions and
+displayed as described in \code{?plotmath}.}
 
 \item{nudge_x, nudge_y}{Horizontal and vertical adjustment to nudge labels by.
-Useful for offsetting text from points, particularly on discrete scales.
-@param relative SHould the positioning `aes` such as offset, dist, wind and vpos relative to the length of the path. The last three are relative to the longest path, for consistency reasons.
-@param reverse Should the label writen in the opposite direction. By default the direction is defined by the sign of the x coordinates of the begining and end of the path.
-If the path ends on the left relative to the start, the labeling is reversed.
-@param smoothing is the path smooth. TRUE by default, recommended to avoid weird kerning.
-@param sg_order Savitzky-Golay smoothing filter order. See `?sgolayfilt` for more details.
-@param sg_length Savitzky-Golay smoothing filter length. Must be odd. See `?sgolayfilt` for more details.}
+Useful for offsetting text from points, particularly on discrete scales.}
+
+\item{relative}{if TRUE (default) the positioning \code{aes} such as offset, dist, wind and vpos is computed relative to the length of the longest path. The last three are relative to the longest path, for consistency reasons.}
+
+\item{reverse}{if TRUE the label is writen in the opposite direction. By default the direction is defined by the sign of the x coordinates of the begining and end of the path.
+If the path ends on the left relative to the start, the labeling is reversed.}
+
+\item{repeated}{if TRUE the label is repeated along the path as often as possible. Each label is separated by a distance of \code{offset}.}
+
+\item{smoothing}{if TRUE(default)  smooth the path before computing the letter positioning. Recommended to avoid weird kerning.}
+
+\item{sg_order}{Savitzky-Golay smoothing filter order. See \code{?sgolayfilt} for more details.}
+
+\item{sg_length}{Savitzky-Golay smoothing filter length. Must be odd. See \code{?sgolayfilt} for more details.}
+
+\item{check_length}{if TRUE (default) the label is pletted only if there is enough space.}
 }
 \description{
 Text
+}
+\details{
+Because the path of a river can be tortuous, the distances are linear "flight" distances rather than distances following the path.
+However if  \code{relative = TRUE} the computed distance are computed relatively to the length of the path group, therefore even a distance lower than 0.5 can place the label at the end of the path.
+For consistency reason if not repeated == FALSE the offset is relative to the path group length (consistency in the position of the unique labels), else it is relative to the maximum path group length (consistency in the distance between labels).
 }
 \section{Alignment}{
 
