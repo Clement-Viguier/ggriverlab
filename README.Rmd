@@ -1,17 +1,18 @@
 ---
 title: "README"
-output:
-  html_document: default
-  html: default
+output: md_document
 ---
 
 ## Labels for rivers in the ggplot2 framework
 
 ggriverlab aims to introduce labels that follow lines to creat nice maps with ggplot2.
-Maybe I should learn how to use GIS dedicated softwares, but it is more to implement this function in R.
+While this function is common in GIS software, I could not find satisfying solutions for R plotting, so here is my take on it.
 
 ## Installation
-```{r install}
+
+The package can be installed from github with the help of the devtool package.
+
+```{r install, eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("Clement-Viguier/ggriverlab")
 
@@ -20,7 +21,7 @@ devtools::install_github("Clement-Viguier/ggriverlab")
 
 ## Demo
 
-```{r gulk}
+```{r gulk, eval = FALSE}
 library(ggriverlab)
 library(riverdist)
 library(ggplot2)
@@ -47,24 +48,24 @@ branch_list <- lapply(branches, function(b, Gulk){
 full_river<- do.call(rbind, branch_list)
 
 ggplot(full_river, aes(x,y, group = branch, colour = as.factor(branch))) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk"), check_length = F) +
-  theme(legend.position = "none")
+ theme_minimal() + theme(legend.position = "none")
 
 # Check_length avoids to print labels that cannot fit the river portion.
 ggplot(full_river, aes(x,y, group = branch, colour = as.factor(branch))) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk"), check_length = T) +
   theme_minimal() +theme(legend.position = "none")
 
-ggplot(full_river, aes(x,y, group = branch, colour = as.factor(branch))) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk"), offset = 0.1, dist = 0.008, check_length = T) +
+ggplot(full_river, aes(x,y, group = branch, colour = as.factor(branch))) + geom_path() + coord_fixed() + geom_river_label(aes(label = "Gulk"), offset = 0.15, dist = 0.01, check_length = T) +
   theme_minimal() +theme(legend.position = "none")
 
 
 ```
 
-The `geom_river_label` function can be used to plot multiple river, or branches at once. If the are too short, the label can be exclude thanks to the option `check_length = T`. The above code produce the following map of the river:
+The `geom_river_label` function can be used to plot multiple river, or branches at once. If they are too short, the label can be exclude thanks to the option `check_length = T`. The above code produce the following map of the river:
 
 ![river labeling with ggriverlab](https://github.com/Clement-Viguier/ggriverlab/blob/master/Images/river_branches.png)
 
 
-```{r animate}
+```{r animate, eval = FALSE}
 # install.packages('devtools')
 # devtools::install_github('thomasp85/gganimate')
 library(gganimate)
@@ -83,40 +84,40 @@ anim
 anim_save("Images/moving_label_smooth.gif", last_animation())
 ```
 
-The effect of the different parameters can be seen here:
+The effect of the different parameters on the label position and shape can be seen here:
 
 ![offset parameter effect on river label](https://github.com/Clement-Viguier/ggriverlab/blob/master/Images/moving_label_offset.gif)
 ![dist parameter effect on river label](https://github.com/Clement-Viguier/ggriverlab/blob/master/Images/moving_label_dist.gif)
 ![vpos parameter effect on river label](https://github.com/Clement-Viguier/ggriverlab/blob/master/Images/moving_label_vpos.gif)
 
 
-<!-- ### Real data -->
+### Larger scale data
 
-<!-- Oceans and rivers  -->
+Oceans and rivers
 
-<!-- ```{r natural earth} -->
-<!-- library(raster) -->
-<!-- library(tidyr) -->
+```{r natural earth, eval= FALSE}
+library(raster)
+library(tidyr)
 
-<!-- ne_rivers <- shapefile("./data/ne_50m_rivers_lake_centerlines.shp") -->
-<!-- ne_lands  <- shapefile("./data/ne_50m_land.shp") -->
-<!-- ne_lakes  <- shapefile("./data/ne_50m_lakes.shp") -->
+ne_rivers <- shapefile("./data/ne_50m_rivers_lake_centerlines.shp")
+ne_lands  <- shapefile("./data/ne_50m_land.shp")
+ne_lakes  <- shapefile("./data/ne_50m_lakes.shp")
 
-<!-- data <- ne_rivers@data -->
-<!-- data$id <- rownames(data) -->
-<!-- rivers_df <- fortify(ne_rivers) %>% left_join(data, by = "id") -->
+data <- ne_rivers@data
+data$id <- rownames(data)
+rivers_df <- fortify(ne_rivers) %>% left_join(data, by = "id")
 
-<!-- lands <- fortify(ne_lands) -->
+lands <- fortify(ne_lands)
 
 
-<!-- ggplot(rivers_df, aes(long, lat, group = group)) + -->
-<!--   geom_polygon(data = lands, aes(long, lat, group = group, alpha = hole), colour = "tan2") + scale_alpha_manual(c(0,1), values = c(FALSE, TRUE)) + -->
-<!--    geom_path(aes(), colour = "steelblue") + geom_river_label(aes(label = label), colour = "steelblue") +  -->
-<!--   coord_fixed() + -->
-<!--   theme_linedraw()+ -->
-<!--   theme_classic() + theme(panel.background = element_rect(fill = "steelblue")) -->
+ggplot(rivers_df, aes(long, lat, group = group)) +
+   geom_path(aes(), colour = "steelblue") + geom_river_label(aes(label = label), colour = "steelblue") +
+  coord_fixed() + 
+  facet_wrap(~id, scales = "free")+
+  theme_linedraw()+
+  theme_classic() + theme(panel.background = element_rect(fill = "steelblue"))
 
-<!-- ``` -->
+```
 
 ### TO DO LIST
 
@@ -132,4 +133,6 @@ The effect of the different parameters can be seen here:
 - $\Box$ make interactive tool to test the parameters; 
 - $\checkmark$ find good default parameters;
 - $\Box$ scale against text size or plot size ?;
+
+
 
